@@ -1,7 +1,8 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
-int main() {
+int main(int argc, char* argv[]) {
     double semitone_ratio;
     double c0;
     double c5; // frequency of Middle C
@@ -14,12 +15,25 @@ int main() {
     // MIDI Note 0 is C, 5 octaves below Middle C
     c0 = c5 * pow(0.5, 5.0);
 
+    if (argc != 2) {
+        printf("%s: converts frequency to nearest MIDI note\n", argv[0]);
+        printf("Usage: %s <frequency>\n", argv[0]);
+        printf(" where frequency is a floating point number\n");
+        return 1;
+    }
+
     // find nearest MIDI note to a fiven frequency in Hz
-    frequency = 400.0;
+    frequency = atof(argv[1]);
+    if (frequency <= 0) {
+        printf("Bad frequency. Should be a positive value\n");
+        return 1;
+    }
+
     fracmidi = log(frequency / c0) / log(semitone_ratio);
     // round fracmidi to the nearest whole number
-    midinote = (int) (fracmidi + 0.5);    
-
+    midinote = (int) (fracmidi + 0.5);
+    if (midinote > 127)
+        midinote = 127;
     printf("The nearest MIDI note to the frequency %f is %d\n",
         frequency, midinote);
 
